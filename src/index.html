@@ -993,14 +993,11 @@ function flattenEntries(entries) {
 
 // סריקה — קורא את כל עץ התיקייה
 async function scanLibraryFolder(folderPath) {
-  setLocateStatus('סורק תיקיות...');
   try {
     const entries = await window.__TAURI__.fs.readDir(folderPath, { recursive: true });
     libraryFiles  = flattenEntries(entries);
-    // סריקה הסתיימה — אין הודעת סטטוס
   } catch(e) {
     libraryFiles = [];
-    setLocateStatus('שגיאה: לא ניתן לקרוא את התיקייה');
     console.error('scanLibraryFolder:', e);
   }
 }
@@ -1084,22 +1081,8 @@ function locateSearch(query) {
         librarySaveBook(file.path, file.name);
         loadBookText(text, file.name);
       } catch(e) {
-        // אין הרשאה — פותח dialog עם הנתיב כברירת מחדל
-        try {
-          const chosen = await window.__TAURI__.dialog.open({
-            multiple: false,
-            defaultPath: file.path,
-            filters: [{ name: 'ספר', extensions: ['txt', 'html', 'htm'] }]
-          });
-          if (!chosen) return;
-          const text = await window.__TAURI__.fs.readTextFile(chosen);
-          bookId   = chosen;
-          bookName = file.name;
-          librarySaveBook(chosen, file.name);
-          loadBookText(text, file.name);
-        } catch(e2) {
-          alert('שגיאה בפתיחת הקובץ:\n' + e2);
-        }
+        console.error('readTextFile failed:', e);
+        alert('שגיאה בפתיחת הקובץ:\n' + e);
       }
     });
     resultsEl.appendChild(item);
