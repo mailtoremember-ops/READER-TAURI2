@@ -1475,7 +1475,10 @@ function applyViewMode(skipRecalc = false) {
 let recalcTimer;
 function recalcPagesLater() {
   clearTimeout(recalcTimer);
-  recalcTimer = setTimeout(recalcPages, 120);
+  // double rAF מבטיח שהדפדפן סיים layout לפני שמודדים scrollWidth
+  recalcTimer = setTimeout(() => {
+    requestAnimationFrame(() => requestAnimationFrame(recalcPages));
+  }, 60);
 }
 
 function recalcPages() {
