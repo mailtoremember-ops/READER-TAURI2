@@ -766,8 +766,6 @@ body.theme-night mark.search-hit.active { background: rgba(200, 140, 40, 0.72); 
 
   <!-- ===== LOCATE SECTION ===== -->
   <div id="locate-section">
-    <div id="folder-name-display"></div>
-    <div id="locate-status"></div>
     <div id="locate-results"></div>
   </div>
 
@@ -999,11 +997,7 @@ async function scanLibraryFolder(folderPath) {
   try {
     const entries = await window.__TAURI__.fs.readDir(folderPath, { recursive: true });
     libraryFiles  = flattenEntries(entries);
-    const msg = libraryFiles.length > 0
-      ? `${libraryFiles.length.toLocaleString('he-IL')} ספרים נמצאו`
-      : 'לא נמצאו קבצים בתיקייה';
-    setLocateStatus(msg);
-    setTimeout(() => setLocateStatus(''), 3000);
+    // סריקה הסתיימה — אין הודעת סטטוס
   } catch(e) {
     libraryFiles = [];
     setLocateStatus('שגיאה: לא ניתן לקרוא את התיקייה');
@@ -1030,8 +1024,6 @@ async function setLibraryFolder() {
 
 // עדכון ה-UI לאחר בחירת תיקייה
 function applyLocateFolder(folderPath) {
-  const folderName = folderPath.split(/[/\\]/).filter(Boolean).pop() || folderPath;
-  document.getElementById('folder-name-display').textContent = '📚 ' + folderName;
   document.getElementById('set-folder-btn').classList.add('has-folder');
   document.getElementById('locate-input').placeholder = 'חפש ספר...';
 }
@@ -1081,12 +1073,34 @@ function locateSearch(query) {
       <div class="locate-item-name">${highlightMatch(file.name, query)}</div>
       <div class="locate-item-path">${escHtml(folderPath)}</div>
     `;
-    item.addEventListener('click', () => {
-      // ניקוי החיפוש לפני פתיחת הספר
+    item.addEventListener('click', async () => {
       document.getElementById('locate-input').value = '';
       resultsEl.innerHTML = '';
       setLocateStatus('');
-      loadFromLibrary(file.path, file.name);
+      try {
+        const text = await window.__TAURI__.fs.readTextFile(file.path);
+        bookId   = file.path;
+        bookName = file.name;
+        librarySaveBook(file.path, file.name);
+        loadBookText(text, file.name);
+      } catch(e) {
+        // אין הרשאה — פותח dialog עם הנתיב כברירת מחדל
+        try {
+          const chosen = await window.__TAURI__.dialog.open({
+            multiple: false,
+            defaultPath: file.path,
+            filters: [{ name: 'ספר', extensions: ['txt', 'html', 'htm'] }]
+          });
+          if (!chosen) return;
+          const text = await window.__TAURI__.fs.readTextFile(chosen);
+          bookId   = chosen;
+          bookName = file.name;
+          librarySaveBook(chosen, file.name);
+          loadBookText(text, file.name);
+        } catch(e2) {
+          alert('שגיאה בפתיחת הקובץ:\n' + e2);
+        }
+      }
     });
     resultsEl.appendChild(item);
   });
