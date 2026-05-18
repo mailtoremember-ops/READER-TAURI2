@@ -7,6 +7,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Heebo:wght@300;400&display=swap" rel="stylesheet">
 <style>
+/* ===== HTML — מונע overflow אופקי ומשמר מקום לסקרולבר ===== */
+html {
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+}
+
 /* ===== ROOT VARIABLES ===== */
 :root {
   --bg-page:        #f0ebe0;
@@ -39,6 +45,7 @@ body {
   flex-direction: column;
   align-items: center;
   transition: background 0.4s, color 0.4s;
+  overflow-x: hidden;
 }
 
 /* ===== TOOLBAR ===== */
