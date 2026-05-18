@@ -23,6 +23,7 @@
         "readFile": true,
         "readDir": true,
         "scope": [
+          "**",
           "$HOME/**",
           "$DESKTOP/**",
           "$DOCUMENT/**",
