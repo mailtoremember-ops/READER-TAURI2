@@ -21,6 +21,7 @@
       "fs": {
         "all": false,
         "readFile": true,
+        "readDir": true,
         "scope": [
           "$HOME/**",
           "$DESKTOP/**",
