@@ -3,6 +3,10 @@ name: Build Tauri App
 on:
   workflow_dispatch:
 
+# ← זה הגורם לתיקון: מעניק ל-GITHUB_TOKEN הרשאת כתיבה ליצירת Releases
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
@@ -40,7 +44,6 @@ jobs:
           releaseDraft: true
           prerelease: false
 
-      # --- השלב החדש: מעלה את קובץ ההתקנה לדף ה-Action ---
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
