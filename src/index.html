@@ -1055,7 +1055,7 @@ function locateSearch(query) {
 
   const q       = query.toLowerCase();
   const matches = libraryFiles
-    .filter(f => f.name.toLowerCase().includes(q))
+    .filter(f => f.name.toLowerCase().includes(q) || f.path.toLowerCase().includes(q))
     .slice(0, 25);
 
   if (!matches.length) {
