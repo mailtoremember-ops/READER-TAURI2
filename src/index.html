@@ -333,7 +333,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  max-height: 300px;
+  max-height: 420px;
   overflow-y: auto;
 }
 .locate-item {
@@ -1056,7 +1056,7 @@ function locateSearch(query) {
   const q       = query.toLowerCase();
   const matches = libraryFiles
     .filter(f => f.name.toLowerCase().includes(q) || f.path.toLowerCase().includes(q))
-    .slice(0, 25);
+    ;
 
   if (!matches.length) {
     setLocateStatus('לא נמצא');
