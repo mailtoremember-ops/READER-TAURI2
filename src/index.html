@@ -219,14 +219,78 @@ body {
   width: 100%; max-width: 560px;
 }
 #upload-screen h2 { font-size: 1.6rem; font-weight: 400; color: var(--accent); }
+/* ===== UNIFIED SEARCH ROW ===== */
+#search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  direction: rtl;
+}
+
+/* עטיפת שדה החיפוש — ממלא את השורה */
+#locate-input-wrap {
+  position: relative;
+  flex: 1;
+}
+
+/* אייקון חיפוש — צד ימין (בתוך השדה, RTL) */
+.locate-search-icon {
+  position: absolute;
+  right: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* כפתור הגדרות תיקייה — צד שמאל של השדה */
+#set-folder-btn {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 38px;
+  background: none; border: none;
+  border-left: 1px solid var(--border);
+  border-radius: 8px 0 0 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+#set-folder-btn:hover {
+  color: var(--accent);
+  background: rgba(107,79,42,0.05);
+}
+#set-folder-btn.has-folder { color: var(--accent); opacity: 0.8; }
+
+#locate-input {
+  width: 100%;
+  background: var(--bg-book);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 9px 36px 9px 44px;
+  outline: none;
+  direction: rtl;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+#locate-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2.5px rgba(107,79,42,0.1);
+}
+#locate-input::placeholder { color: var(--text-muted); opacity: 0.7; }
+
+/* כפתור פתח ספר — ריבוע קטן, הכי שמאלי */
 #open-book-btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 8px 20px;
-  border: 1px solid var(--border); border-radius: 7px;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 42px; height: 42px;
+  border: 1px solid var(--border); border-radius: 8px;
   background: var(--bg-book);
   color: var(--text-muted);
-  font-family: var(--font-body); font-size: 0.88rem;
-  cursor: pointer;
+  cursor: pointer; flex-shrink: 0;
   transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 #open-book-btn:hover {
@@ -243,86 +307,18 @@ body {
   gap: 10px;
   align-items: center;
 }
-#locate-divider {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--text-muted);
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-}
-#locate-divider::before,
-#locate-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-#locate-folder-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-#set-folder-btn {
-  display: inline-flex; align-items: center; gap: 7px;
-  padding: 7px 16px;
-  border: 1px dashed var(--border); border-radius: 7px;
-  background: none;
-  color: var(--text-muted);
-  font-family: var(--font-body); font-size: 0.84rem;
-  cursor: pointer;
-  transition: border-color 0.2s, color 0.2s, background 0.2s;
-  flex-shrink: 0;
-}
-#set-folder-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: rgba(107,79,42,0.04);
-}
+
+/* טולטיפ שם תיקייה */
 #folder-name-display {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
-  max-width: 180px;
+  text-align: center;
+  letter-spacing: 0.02em;
+  opacity: 0.8;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
-  letter-spacing: 0.02em;
-}
-#locate-input-wrap {
-  position: relative;
-  width: 100%;
-  display: none; /* shown after folder is set */
-}
-#locate-input {
-  width: 100%;
-  background: var(--bg-book);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  padding: 9px 14px 9px 38px;
-  outline: none;
-  direction: rtl;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-#locate-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2.5px rgba(107,79,42,0.1);
-}
-#locate-input::placeholder { color: var(--text-muted); opacity: 0.7; }
-.locate-search-icon {
-  position: absolute;
-  left: 11px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-muted);
-  pointer-events: none;
-  opacity: 0.6;
+  max-width: 100%;
 }
 #locate-status {
   font-size: 0.75rem;
@@ -741,32 +737,36 @@ body.theme-night mark.search-hit.active { background: rgba(200, 140, 40, 0.72); 
 <div id="upload-screen">
   <h2>קורא ספרים</h2>
 
-  <button id="open-book-btn" onclick="openTauriFile()">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-      <polyline points="14 2 14 8 20 8"/>
-    </svg>
-    פתח ספר
-  </button>
-
-  <!-- ===== LOCATE / FOLDER SEARCH ===== -->
-  <div id="locate-section">
-    <div id="locate-divider">איתור בספרייה</div>
-    <div id="locate-folder-row">
-      <button id="set-folder-btn">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-        </svg>
-        <span id="set-folder-label">הגדר תיקיית ספרים</span>
-      </button>
-      <span id="folder-name-display"></span>
-    </div>
+  <!-- ===== UNIFIED SEARCH ROW ===== -->
+  <div id="search-row">
+    <!-- שדה חיפוש עם אייקון חיפוש בימין וכפתור הגדרות בשמאל -->
     <div id="locate-input-wrap">
+      <!-- אייקון חיפוש — צד ימין -->
       <svg class="locate-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/>
       </svg>
-      <input id="locate-input" type="text" placeholder="הקלד שם ספר לאיתור..." autocomplete="off" spellcheck="false">
+      <input id="locate-input" type="text" placeholder="חפש ספר..." autocomplete="off" spellcheck="false">
+      <!-- כפתור הגדרות תיקייה — צד שמאל -->
+      <button id="set-folder-btn" title="הגדר תיקיית ספרים">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
     </div>
+
+    <!-- כפתור פתח ספר — הכי שמאלי -->
+    <button id="open-book-btn" onclick="openTauriFile()" title="פתח ספר">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ===== LOCATE SECTION ===== -->
+  <div id="locate-section">
+    <div id="folder-name-display"></div>
     <div id="locate-status"></div>
     <div id="locate-results"></div>
   </div>
@@ -1032,8 +1032,8 @@ async function setLibraryFolder() {
 function applyLocateFolder(folderPath) {
   const folderName = folderPath.split(/[/\\]/).filter(Boolean).pop() || folderPath;
   document.getElementById('folder-name-display').textContent = '📚 ' + folderName;
-  document.getElementById('set-folder-label').textContent    = 'שנה תיקייה';
-  document.getElementById('locate-input-wrap').style.display = '';
+  document.getElementById('set-folder-btn').classList.add('has-folder');
+  document.getElementById('locate-input').placeholder = 'חפש ספר...';
 }
 
 // עדכון סטטוס
