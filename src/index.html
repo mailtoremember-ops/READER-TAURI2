@@ -140,13 +140,13 @@ body {
 
 /* ===== CHAPTER HEADING ===== */
 #chapter-heading {
-  display: none; /* מסתיר את הכותרת לגמרי */
+  display: none;
 }
 /* ===== CONTENT ===== */
 #content {
   font-size: var(--font-size);
   line-height: var(--line-height);
-  text-align: var(--text-align); /* מחובר למשתנה דינמי */
+  text-align: var(--text-align);
   direction: rtl; 
 }
 .mode-single #content,
@@ -233,6 +233,149 @@ body {
   border-color: var(--accent);
   color: var(--accent);
   background: rgba(107,79,42,0.04);
+}
+
+/* ===== LOCATE SECTION ===== */
+#locate-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+#locate-divider {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+#locate-divider::before,
+#locate-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+#locate-folder-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+#set-folder-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 16px;
+  border: 1px dashed var(--border); border-radius: 7px;
+  background: none;
+  color: var(--text-muted);
+  font-family: var(--font-body); font-size: 0.84rem;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+#set-folder-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(107,79,42,0.04);
+}
+#folder-name-display {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+#locate-input-wrap {
+  position: relative;
+  width: 100%;
+  display: none; /* shown after folder is set */
+}
+#locate-input {
+  width: 100%;
+  background: var(--bg-book);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 9px 14px 9px 38px;
+  outline: none;
+  direction: rtl;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+#locate-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2.5px rgba(107,79,42,0.1);
+}
+#locate-input::placeholder { color: var(--text-muted); opacity: 0.7; }
+.locate-search-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+  opacity: 0.6;
+}
+#locate-status {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  min-height: 1.2em;
+  text-align: center;
+}
+#locate-results {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.locate-item {
+  background: var(--bg-book);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 10px 14px;
+  cursor: pointer;
+  text-align: right;
+  transition: border-color 0.15s, background 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.locate-item:hover {
+  border-color: var(--accent);
+  background: rgba(107,79,42,0.03);
+}
+.locate-item-name {
+  font-size: 0.93rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.locate-item-name mark {
+  background: rgba(107,79,42,0.15);
+  border-radius: 2px;
+  color: var(--accent);
+  font-weight: 500;
+  padding: 0 1px;
+}
+.locate-item-path {
+  font-size: 0.66rem;
+  color: var(--text-muted);
+  direction: ltr;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ===== LIBRARY ===== */
@@ -606,9 +749,31 @@ body.theme-night mark.search-hit.active { background: rgba(200, 140, 40, 0.72); 
     פתח ספר
   </button>
 
+  <!-- ===== LOCATE / FOLDER SEARCH ===== -->
+  <div id="locate-section">
+    <div id="locate-divider">איתור בספרייה</div>
+    <div id="locate-folder-row">
+      <button id="set-folder-btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+        </svg>
+        <span id="set-folder-label">הגדר תיקיית ספרים</span>
+      </button>
+      <span id="folder-name-display"></span>
+    </div>
+    <div id="locate-input-wrap">
+      <svg class="locate-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/>
+      </svg>
+      <input id="locate-input" type="text" placeholder="הקלד שם ספר לאיתור..." autocomplete="off" spellcheck="false">
+    </div>
+    <div id="locate-status"></div>
+    <div id="locate-results"></div>
+  </div>
+
   <!-- Library of saved books -->
   <div id="library-section">
-    <div id="library-title">ספרים שמורים</div>
+    <div id="library-title">נפתחו לאחרונה</div>
     <div id="library-grid"><!-- filled by JS --></div>
   </div>
 </div>
@@ -651,7 +816,6 @@ body.theme-night mark.search-hit.active { background: rgba(200, 140, 40, 0.72); 
   </div>
 
   <nav id="nav">
-    <!-- כפתור קודם נמצא כעת מימין כי direction הוא rtl -->
     <button class="nav-btn" id="btn-prev" disabled>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
       קודם
@@ -659,7 +823,6 @@ body.theme-night mark.search-hit.active { background: rgba(200, 140, 40, 0.72); 
     
     <span id="page-indicator"></span>
     
-    <!-- כפתור הבא נמצא משמאל -->
     <button class="nav-btn" id="btn-next" disabled>
       הבא
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
@@ -790,15 +953,177 @@ body.theme-night mark.search-hit.active { background: rgba(200, 140, 40, 0.72); 
 let chapters    = [];
 let current     = 0;
 let bookName    = '';
-let bookId      = '';   // שם + גודל קובץ, מזהה ייחודי
-let viewMode    = 'scroll';   // 'scroll' | 'single' | 'double'
-let textAlign   = 'justify';  // 'right' | 'justify' | 'center'
+let bookId      = '';
+let viewMode    = 'scroll';
+let textAlign   = 'justify';
 let innerPage   = 0;
 let totalInner  = 1;
 
-const SETTINGS_KEY = 'reader_settings_v3';
-const PROGRESS_KEY = 'reader_progress_v2';  // v2: מבנה מורחב
-const LIBRARY_KEY  = 'reader_library_v1';   // Tauri: path בלבד, ללא תוכן
+const SETTINGS_KEY      = 'reader_settings_v3';
+const PROGRESS_KEY      = 'reader_progress_v2';
+const LIBRARY_KEY       = 'reader_library_v1';
+const LIBRARY_FOLDER_KEY = 'reader_library_folder_v1';
+
+// ══════════════════════════════════════════════════════
+// ── LOCATE — חיפוש בתיקיית ספרים ─────────────────────
+// ══════════════════════════════════════════════════════
+
+let libraryFiles = [];       // [{name, path}] — כל קבצי הספרייה
+let locateDebounceTimer = null;
+const BOOK_EXTS = new Set(['txt', 'html', 'htm']);
+
+// שיטוח רקורסיבי של עץ readDir
+function flattenEntries(entries) {
+  const result = [];
+  for (const entry of entries) {
+    // תיקייה — יש לה children (גם אם ריקה)
+    if (entry.children !== undefined && entry.children !== null) {
+      result.push(...flattenEntries(entry.children));
+    } else {
+      const name = entry.name || '';
+      const ext  = name.split('.').pop().toLowerCase();
+      if (BOOK_EXTS.has(ext)) {
+        result.push({
+          name: name.replace(/\.[^.]+$/, ''),   // ללא סיומת
+          path: entry.path
+        });
+      }
+    }
+  }
+  return result;
+}
+
+// סריקה — קורא את כל עץ התיקייה
+async function scanLibraryFolder(folderPath) {
+  setLocateStatus('סורק תיקיות...');
+  try {
+    const entries = await window.__TAURI__.fs.readDir(folderPath, { recursive: true });
+    libraryFiles  = flattenEntries(entries);
+    const msg = libraryFiles.length > 0
+      ? `${libraryFiles.length.toLocaleString('he-IL')} ספרים נמצאו`
+      : 'לא נמצאו קבצים בתיקייה';
+    setLocateStatus(msg);
+    setTimeout(() => setLocateStatus(''), 3000);
+  } catch(e) {
+    libraryFiles = [];
+    setLocateStatus('שגיאה: לא ניתן לקרוא את התיקייה');
+    console.error('scanLibraryFolder:', e);
+  }
+}
+
+// בחירת תיקייה חדשה
+async function setLibraryFolder() {
+  try {
+    const folderPath = await window.__TAURI__.dialog.open({
+      directory: true,
+      multiple:  false,
+      title:     'בחר תיקיית ספרים'
+    });
+    if (!folderPath) return;
+    localStorage.setItem(LIBRARY_FOLDER_KEY, folderPath);
+    applyLocateFolder(folderPath);
+    await scanLibraryFolder(folderPath);
+  } catch(e) {
+    alert('שגיאה בבחירת תיקייה:\n' + e);
+  }
+}
+
+// עדכון ה-UI לאחר בחירת תיקייה
+function applyLocateFolder(folderPath) {
+  const folderName = folderPath.split(/[/\\]/).filter(Boolean).pop() || folderPath;
+  document.getElementById('folder-name-display').textContent = '📚 ' + folderName;
+  document.getElementById('set-folder-label').textContent    = 'שנה תיקייה';
+  document.getElementById('locate-input-wrap').style.display = '';
+}
+
+// עדכון סטטוס
+function setLocateStatus(msg) {
+  document.getElementById('locate-status').textContent = msg;
+}
+
+// הדגשת חלק מחרוזת
+function highlightMatch(text, query) {
+  if (!query) return escHtml(text);
+  const safe = escHtml(text);
+  const safeQ = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return safe.replace(new RegExp(`(${safeQ})`, 'gi'), '<mark>$1</mark>');
+}
+
+// חיפוש וסינון
+function locateSearch(query) {
+  const resultsEl = document.getElementById('locate-results');
+  resultsEl.innerHTML = '';
+
+  if (!query || !libraryFiles.length) {
+    setLocateStatus('');
+    return;
+  }
+
+  const q       = query.toLowerCase();
+  const matches = libraryFiles
+    .filter(f => f.name.toLowerCase().includes(q))
+    .slice(0, 25);
+
+  if (!matches.length) {
+    setLocateStatus('לא נמצא');
+    return;
+  }
+  setLocateStatus('');
+
+  matches.forEach(file => {
+    // נתיב התיקייה (ללא שם הקובץ)
+    const parts      = file.path.replace(/\\/g, '/').split('/');
+    const folderPath = parts.slice(0, -1).join('/');
+
+    const item = document.createElement('div');
+    item.className = 'locate-item';
+    item.innerHTML = `
+      <div class="locate-item-name">${highlightMatch(file.name, query)}</div>
+      <div class="locate-item-path">${escHtml(folderPath)}</div>
+    `;
+    item.addEventListener('click', () => {
+      // ניקוי החיפוש לפני פתיחת הספר
+      document.getElementById('locate-input').value = '';
+      resultsEl.innerHTML = '';
+      setLocateStatus('');
+      loadFromLibrary(file.path, file.name);
+    });
+    resultsEl.appendChild(item);
+  });
+}
+
+// אתחול — טעינת תיקייה שמורה
+async function initLocate() {
+  const folderPath = localStorage.getItem(LIBRARY_FOLDER_KEY);
+  if (!folderPath) return;
+  applyLocateFolder(folderPath);
+  await scanLibraryFolder(folderPath);
+}
+
+// wire-up locate
+document.getElementById('set-folder-btn').addEventListener('click', setLibraryFolder);
+
+document.getElementById('locate-input').addEventListener('input', function() {
+  clearTimeout(locateDebounceTimer);
+  const q = this.value.trim();
+  if (!q) {
+    document.getElementById('locate-results').innerHTML = '';
+    setLocateStatus('');
+    return;
+  }
+  locateDebounceTimer = setTimeout(() => locateSearch(q), 200);
+});
+
+// ניקוי תיבת האיתור בעת חזרה למסך הבית
+function resetLocateInput() {
+  const inp = document.getElementById('locate-input');
+  if (inp) { inp.value = ''; }
+  const res = document.getElementById('locate-results');
+  if (res) { res.innerHTML = ''; }
+  setLocateStatus('');
+}
+
+// ══════════════════════════════════════════════════════
 
 // ── Library (localStorage, path בלבד) ─────────────────
 function librarySaveBook(path, name) {
@@ -832,7 +1157,7 @@ async function openTauriFile() {
     if (!path) return;
     const text = await window.__TAURI__.fs.readTextFile(path);
     bookId   = path;
-    bookName = path.split(/[\\/]/).pop().replace(/\.[^.]+$/, '');
+    bookName = path.split(/[\\\/]/).pop().replace(/\.[^.]+$/, '');
     librarySaveBook(path, bookName);
     loadBookText(text, bookName);
   } catch(e) {
@@ -870,7 +1195,6 @@ const COLOR_PRESETS = [
   { bg: '#fdf6e3', page: '#eee8d5', text: '#282822', muted: '#7a7060', accent: '#a05c28', border: '#d3cbb8', label: 'ספריה', dark: false },
 ];
 
-// Build preset dots
 (function buildPresets() {
   const container = document.getElementById('color-presets');
   COLOR_PRESETS.forEach((p, i) => {
@@ -976,7 +1300,6 @@ function saveSettings() {
 
 // ── Progress / Bookmark ────────────────────────────────
 function saveProgress(id, data) {
-  // data = { chapter, innerPage, scrollTop }
   try {
     const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '{}');
     p[id] = { ...data, savedAt: Date.now() };
@@ -990,7 +1313,6 @@ function loadProgress(id) {
   } catch(e) { return { chapter: 0, innerPage: 0, scrollTop: 0 }; }
 }
 
-// שמירה אוטומטית תוך-כדי קריאה
 let autoSaveTimer;
 function scheduleAutoSave() {
   clearTimeout(autoSaveTimer);
@@ -1001,7 +1323,6 @@ function scheduleAutoSave() {
   }, 800);
 }
 
-// toast קצר
 let toastTimer;
 function showToast(msg) {
   bookmarkToast.textContent = msg;
@@ -1061,7 +1382,7 @@ async function loadFromLibrary(path, name) {
     const text = await window.__TAURI__.fs.readTextFile(path);
     bookId   = path;
     bookName = name;
-    librarySaveBook(path, name); // עדכן lastRead
+    librarySaveBook(path, name);
     loadBookText(text, name);
   } catch(e) {
     alert('הקובץ לא נמצא. אולי הועבר או נמחק.');
@@ -1070,7 +1391,6 @@ async function loadFromLibrary(path, name) {
   }
 }
 
-// הרסטורציה של מיקום — נקראת מתוך recalcPages אחרי עיצוב
 let pendingRestore = null;
 function restorePending() {
   if (!pendingRestore) return;
@@ -1118,10 +1438,7 @@ function computePageHeight() {
   const toolbarH = toolbar.offsetHeight || 52;
   const navH     = document.getElementById('nav').offsetHeight || 72;
   const padY     = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--padding-y')) || 56;
-  
-  // החישוב החדש: ללא הכותרת הפנימית שהוסתרה
   const total    = window.innerHeight - toolbarH - navH - (padY * 2) - 8;
-  
   return Math.max(180, total);
 }
 
@@ -1164,7 +1481,7 @@ function recalcPages() {
   
   scrollWrap.style.transition = 'none';
   scrollWrap.style.transform = 'none';
-  void scrollWrap.offsetWidth; // Force Reflow
+  void scrollWrap.offsetWidth;
 
   const pw = viewport.clientWidth;
   if (pw <= 0) return;
@@ -1187,7 +1504,6 @@ function applyPagePosition(animate) {
   const pw = viewport.clientWidth;
   const gap = getColumnGap();
   const shift = pw + gap;
-  
   const targetX = innerPage * shift;
 
   if (!animate) {
@@ -1217,13 +1533,11 @@ function renderChapter(idx, restorePos) {
   const ch = chapters[current];
 
   chHeading.textContent = ch.title || '';
-  // אם יש חיפוש פעיל ויש markedHtml מוכן — השתמש בו ישירות (ללא הבזק)
   content.innerHTML = (searchState.query && ch.markedHtml) ? ch.markedHtml : (ch.html || '');
 
   innerPage = 0;
   titleBar.textContent = bookName + (ch.title ? ` · ${ch.title}` : '');
 
-  // שמירת התקדמות — לא בזמן קפיצת חיפוש
   if (bookId && !searchState.query) saveProgress(bookId, { chapter: current, innerPage: 0, scrollTop: 0 });
 
   document.querySelectorAll('.toc-item').forEach((el, i) =>
@@ -1236,11 +1550,9 @@ function renderChapter(idx, restorePos) {
     if (restorePos && restorePos.scrollTop) {
       requestAnimationFrame(() => window.scrollTo({ top: restorePos.scrollTop }));
     }
-    // אם יש קפיצת חיפוש ממתינה
     if (searchState._pendingJump !== null) {
       const pj = searchState._pendingJump;
       searchState._pendingJump = null;
-      // הmarks כבר ב-DOM (מ-markedHtml)
       searchState.hits = [...content.querySelectorAll('mark.search-hit')];
       requestAnimationFrame(() => {
         const idx2 = pj === 'last' ? searchState.hits.length - 1 : 0;
@@ -1252,7 +1564,6 @@ function renderChapter(idx, restorePos) {
     scrollWrap.style.transition = 'none';
     scrollWrap.style.transform = 'translateX(0)';
     recalcPagesLater();
-    // אם יש קפיצת חיפוש ממתינה — אחרי recalc
     if (searchState._pendingJump !== null) {
       const pj = searchState._pendingJump;
       searchState._pendingJump = null;
@@ -1288,7 +1599,6 @@ btnPrev.onclick = () => {
   else if (current > 0) renderChapter(current - 1);
 };
 
-// שמירה אוטומטית בגלילה
 window.addEventListener('scroll', scheduleAutoSave, { passive: true });
 
 // ── TOC ────────────────────────────────────────────────
@@ -1305,7 +1615,6 @@ function buildToc() {
   });
 }
 document.getElementById('toc-btn').onclick = () => tocOverlay.classList.toggle('open');
-
 tocOverlay.addEventListener('click', e => { if (e.target === tocOverlay) closeToc(); });
 
 // ── Settings panel ─────────────────────────────────────
@@ -1316,7 +1625,6 @@ document.getElementById('settings-btn').onclick   = openSettings;
 document.getElementById('settings-close').onclick = closeSettings;
 settingsOverlay.addEventListener('click', e => { if (e.target === settingsOverlay) closeSettings(); });
 
-// View mode buttons
 document.querySelectorAll('.mode-btn').forEach(btn => {
   btn.onclick = function() {
     viewMode = this.dataset.mode;
@@ -1326,7 +1634,6 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
   };
 });
 
-// Alignment buttons
 document.querySelectorAll('.align-btn').forEach(btn => {
   btn.onclick = function() {
     textAlign = this.dataset.align;
@@ -1335,14 +1642,12 @@ document.querySelectorAll('.align-btn').forEach(btn => {
   };
 });
 
-// Font family
 document.getElementById('font-family').onchange = function() {
   document.documentElement.style.setProperty('--font-body', this.value);
   recalcPagesLater();
   saveSettings();
 };
 
-// Local fonts (Chrome/Edge only)
 document.getElementById('load-local-fonts').onclick = async function() {
   if (!('queryLocalFonts' in window)) {
     alert('טעינת גופנים מקומיים זמינה ב-Chrome ו-Edge בלבד.');
@@ -1371,13 +1676,11 @@ document.getElementById('load-local-fonts').onclick = async function() {
   }
 };
 
-// Font size
 document.getElementById('font-dec').onclick   = () => changeFontSize(-0.08);
 document.getElementById('font-inc').onclick   = () => changeFontSize(+0.08);
 document.getElementById('font-dec-s').onclick = () => changeFontSize(-0.08);
 document.getElementById('font-inc-s').onclick = () => changeFontSize(+0.08);
 
-// Line height slider
 document.getElementById('lh-slider').oninput = function() {
   document.documentElement.style.setProperty('--line-height', this.value);
   document.getElementById('lh-val').textContent = parseFloat(this.value).toFixed(1);
@@ -1399,7 +1702,6 @@ document.getElementById('indent-slider').oninput = function() {
   saveSettings();
 };
 
-// Margins slider
 document.getElementById('margin-slider').oninput = function() {
   document.documentElement.style.setProperty('--padding-x', this.value + 'px');
   document.getElementById('margin-val').textContent = this.value;
@@ -1416,7 +1718,6 @@ document.getElementById('margin-y-slider').oninput = function() {
   saveSettings();
 };
 
-// Background color picker
 document.getElementById('bg-picker').oninput = function() {
   applyCustomColor(this.value);
 };
@@ -1463,7 +1764,7 @@ function loadBookText(text, nameHint) {
   buildToc();
   uploadScreen.style.display = 'none';
   readingArea.style.display  = 'flex';
-  applyViewMode(true);  // הגדרת מצב תצוגה ללא recalc — renderChapter יטפל בזה
+  applyViewMode(true);
 
   const prog = loadProgress(bookId);
   renderChapter(prog.chapter || 0, prog);
@@ -1474,7 +1775,6 @@ let toolbarTimer;
 function resetToolbarTimer() {
   toolbar.classList.remove('hidden');
   clearTimeout(toolbarTimer);
-  // אל תסתיר טולבר כשהחיפוש פתוח
   toolbarTimer = setTimeout(() => {
     if (!document.getElementById('search-bar').classList.contains('open'))
       toolbar.classList.add('hidden');
@@ -1484,7 +1784,6 @@ document.addEventListener('mousemove', resetToolbarTimer);
 document.addEventListener('touchstart', resetToolbarTimer);
 
 // ── Keyboard ───────────────────────────────────────────
-// ── Ctrl+F ─────────────────────────────────────────────
 document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key === 'f') { e.preventDefault(); openSearch(); return; }
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
@@ -1510,11 +1809,11 @@ document.getElementById('close-btn').onclick = () => {
   chapters = []; current = 0; bookId = '';
   readingArea.style.display  = 'none';
   uploadScreen.style.display = 'flex';
+  resetLocateInput();
   refreshLibrary();
 };
 
 // ── App Close / Unload ─────────────────────────────────
-// שומר את המיקום באופן מיידי רגע לפני שהמשתמש סוגר את חלון האפליקציה
 window.addEventListener('beforeunload', () => {
   if (bookId && !searchState.query) {
     const scrollTop = viewMode === 'scroll' ? window.scrollY : 0;
@@ -1526,17 +1825,15 @@ window.addEventListener('beforeunload', () => {
 // ── SEARCH ENGINE ─────────────────────────────────────
 // ══════════════════════════════════════════════════════
 
-// מצב החיפוש
 const searchState = {
   query:         '',
-  hits:          [],   // <mark> elements בפרק הנוכחי
+  hits:          [],
   current:       -1,
-  chapterCounts: [],   // [{ chapterIdx, count }] לכל הספר
-  _pendingJump:  null, // 'first' | 'last' — לאחר מעבר פרק
+  chapterCounts: [],
+  _pendingJump:  null,
 };
 let searchDebounceTimer = null;
 
-// ── Regex עם ניקוד ────────────────────────────────────
 function buildNiqqudRegex(q) {
   if (!q) return null;
   const niq = '[\u05B0-\u05C7\u05F0-\u05F4]*';
@@ -1544,8 +1841,6 @@ function buildNiqqudRegex(q) {
   return new RegExp(escaped, 'g');
 }
 
-// ── סימון HTML של פרק (שמור ב-ch.markedHtml) ──────────
-// כמו בפתרון_דפים: עובד על div זמני, לא נוגע ב-DOM
 function buildMarkedHtml(html, query) {
   if (!html || !query) return { markedHtml: html, count: 0 };
   const div = document.createElement('div');
@@ -1564,7 +1859,6 @@ function buildMarkedHtml(html, query) {
     regexPattern.lastIndex = 0;
     if (!regexPattern.test(text)) return;
     regexPattern.lastIndex = 0;
-    // split על הגרופ הלוכד (index 1 = החלק שתאם)
     const parts = text.split(new RegExp(`(${regexPattern.source})`, regexPattern.flags));
     const span = document.createElement('span');
     span.innerHTML = parts.map((p, i) => {
@@ -1578,7 +1872,6 @@ function buildMarkedHtml(html, query) {
   return { markedHtml: div.innerHTML, count };
 }
 
-// ── בניית אינדקס על כל הספר ───────────────────────────
 function buildSearchIndex(query) {
   searchState.chapterCounts = [];
   if (!query) { chapters.forEach(ch => { ch.markedHtml = null; }); return; }
@@ -1589,9 +1882,6 @@ function buildSearchIndex(query) {
   });
 }
 
-// ── חישוב עמוד של אלמנט — ללא לולאה ─────────────────
-// מאפס את ה-transform, מחשב מתמטית, ומשחזר.
-// מחזיר את העמוד שבו ה-mark נראה לעין (מרכז האלמנט בתוך ה-viewport).
 function pageOfElement(el) {
   if (viewMode === 'scroll') return 0;
 
@@ -1599,17 +1889,12 @@ function pageOfElement(el) {
   const savedTransition = scrollWrap.style.transition;
   scrollWrap.style.transition = 'none';
   scrollWrap.style.transform  = 'translateX(0)';
-  void scrollWrap.offsetWidth; // force reflow
+  void scrollWrap.offsetWidth;
 
   const shift    = viewport.clientWidth + getColumnGap();
   const vpLeft   = viewport.getBoundingClientRect().left;
   const rect     = el.getBoundingClientRect();
-
-  // מרכז האלמנט — עמיד יותר מגבול שמאלי לאלמנטים על גבולות עמודה
   const elCenter = rect.left + rect.width / 2 - vpLeft;
-
-  // RTL CSS columns: עמוד 0 נמצא ב-elCenter ∈ [0, vw),
-  //                  עמוד 1 נמצא ב-elCenter ∈ [-shift, 0), וכו'
   const page = Math.max(0, Math.round(-elCenter / shift));
 
   scrollWrap.style.transform  = savedTransform;
@@ -1618,17 +1903,14 @@ function pageOfElement(el) {
   return page;
 }
 
-// בדיקה אם mark נראה כרגע במסך (אחרי קפיצה)
 function isMarkVisible(el) {
   const r  = el.getBoundingClientRect();
   const vr = viewport.getBoundingClientRect();
-  // בדוק שמרכז האלמנט בתוך ה-viewport אופקית ואנכית
   const cx = (r.left + r.right)  / 2;
   const cy = (r.top  + r.bottom) / 2;
   return cx >= vr.left && cx <= vr.right && cy >= vr.top && cy <= vr.bottom;
 }
 
-// ── קפיצה ל-hit לפי אינדקס מקומי ─────────────────────
 function jumpToHit(idx) {
   if (!searchState.hits.length) { updateSearchCounter(); return; }
   idx = ((idx % searchState.hits.length) + searchState.hits.length) % searchState.hits.length;
@@ -1644,16 +1926,13 @@ function jumpToHit(idx) {
     const page = pageOfElement(el);
     goToInnerPage(page, false);
 
-    // וידוא: אם אחרי הקפיצה המרק עדיין לא נראה (נפל על גבול עמודה),
-    // נסה עמוד אחד קדימה ואחד אחורה
     requestAnimationFrame(() => {
       if (!isMarkVisible(el)) {
-        // בדוק page+1
         if (page + 1 < totalInner) {
           goToInnerPage(page + 1, false);
           requestAnimationFrame(() => {
             if (!isMarkVisible(el) && page > 0) {
-              goToInnerPage(page, false); // חזור לחשיבה המקורית
+              goToInnerPage(page, false);
             }
           });
         }
@@ -1663,7 +1942,6 @@ function jumpToHit(idx) {
   updateSearchCounter();
 }
 
-// ── ניווט חיפוש קדימה / אחורה (cross-chapter) ─────────
 function prevSearchHit() {
   if (searchState.current > 0) { jumpToHit(searchState.current - 1); return; }
   const prevCh = [...searchState.chapterCounts].reverse().find(c => c.chapterIdx < current);
@@ -1676,11 +1954,9 @@ function nextSearchHit() {
   if (nextCh) { searchState._pendingJump = 'first'; renderChapter(nextCh.chapterIdx); }
 }
 
-// ── הפעלת חיפוש ───────────────────────────────────────
 function runSearch(query) {
   searchState.query = query;
   if (!query) {
-    // ניקוי: החזר HTML רגיל תוך שמירת מיקום
     const savedPage   = innerPage;
     const savedScroll = window.scrollY;
     content.innerHTML = chapters[current].html || '';
@@ -1710,13 +1986,11 @@ function runSearch(query) {
     return;
   }
 
-  // טעון את הפרק הראשון עם תוצאות (אם לא כבר שם)
   const firstCh = searchState.chapterCounts[0].chapterIdx;
   if (current !== firstCh) {
     searchState._pendingJump = 'first';
     renderChapter(firstCh);
   } else {
-    // כבר בפרק הנכון — טען markedHtml ישירות
     const savedPage   = innerPage;
     const savedScroll = window.scrollY;
     content.innerHTML = chapters[current].markedHtml || chapters[current].html;
@@ -1734,7 +2008,6 @@ function runSearch(query) {
   }
 }
 
-// ── עדכון מונה ────────────────────────────────────────
 function updateSearchCounter() {
   const counter  = document.getElementById('search-counter');
   const input    = document.getElementById('search-input');
@@ -1750,7 +2023,6 @@ function updateSearchCounter() {
     return;
   }
 
-  // סך כל התוצאות בכל הספר
   const globalTotal = searchState.chapterCounts.reduce((s, c) => s + c.count, 0);
 
   if (globalTotal === 0) {
@@ -1766,7 +2038,6 @@ function updateSearchCounter() {
   counter.className = '';
 
   if (searchState.current >= 0) {
-    // כמה hits יש בפרקים שלפני הנוכחי
     const hitsBeforeCurrentChapter = searchState.chapterCounts
       .filter(c => c.chapterIdx < current)
       .reduce((s, c) => s + c.count, 0);
@@ -1776,7 +2047,6 @@ function updateSearchCounter() {
     counter.textContent = `0/${globalTotal}`;
   }
 
-  // כפתורי ניווט
   const atFirst = searchState.current <= 0 &&
     !searchState.chapterCounts.some(c => c.chapterIdx < current);
   const atLast  = searchState.current >= total - 1 &&
@@ -1785,7 +2055,6 @@ function updateSearchCounter() {
   document.getElementById('search-next').disabled = atLast;
 }
 
-// ── פתיחה / סגירה ─────────────────────────────────────
 function openSearch() {
   document.getElementById('search-bar').classList.add('open');
   document.getElementById('search-btn').classList.add('active');
@@ -1795,7 +2064,6 @@ function openSearch() {
 function closeSearch() {
   document.getElementById('search-bar').classList.remove('open');
   document.getElementById('search-btn').classList.remove('active');
-  // ניקוי ללא שינוי מיקום
   const savedPage   = innerPage;
   const savedScroll = window.scrollY;
   if (searchState.query) {
@@ -1823,7 +2091,6 @@ function closeSearch() {
   document.getElementById('search-next').disabled = true;
 }
 
-// ── wire-up ────────────────────────────────────────────
 document.getElementById('search-btn').onclick   = () =>
   document.getElementById('search-bar').classList.contains('open') ? closeSearch() : openSearch();
 document.getElementById('search-close').onclick = closeSearch;
@@ -1839,8 +2106,6 @@ document.getElementById('search-input').addEventListener('keydown', e => {
   if (e.key === 'Escape') { e.preventDefault(); closeSearch(); }
 });
 
-// ── Ctrl+F ─────────────────────────────────────────────
-
 // ══════════════════════════════════════════════════════
 
 // ── Init ───────────────────────────────────────────────
@@ -1849,12 +2114,11 @@ updateViewModeBtns();
 applyTextAlign();
 resetToolbarTimer();
 updateFontDisplay();
-refreshLibrary();  // טעינת ספרים שמורים
+refreshLibrary();
+initLocate();   // ← טעינת תיקיית הספרים השמורה
 
-// --- הקוד החדש להצגת החלון ---
 window.addEventListener('DOMContentLoaded', () => {
   if (window.__TAURI__) {
-    // מציג את החלון רק אחרי שהמיקום שוחזר והדף נטען
     window.__TAURI__.window.appWindow.show();
   }
 });
