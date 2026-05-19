@@ -740,6 +740,21 @@ mark.search-hit.active {
 }
 body.theme-night mark.search-hit        { background: rgba(180, 130, 30, 0.3); }
 body.theme-night mark.search-hit.active { background: rgba(200, 140, 40, 0.72); color: #fff; }
+
+/* ══ מצב גלילה: layout קבוע בין טולבר לנב ══ */
+body.scroll-mode { height: 100vh; overflow: hidden; }
+body.scroll-mode .reading-area { flex: 1; min-height: 0; overflow: hidden; }
+body.scroll-mode #toolbar { flex-shrink: 0; opacity: 1 !important; pointer-events: all !important; }
+body.scroll-mode #book { flex: 1; min-height: 0; overflow-y: auto; }
+body.scroll-mode #page-viewport { flex: unset; height: auto; overflow: visible; }
+body.scroll-mode #page-scroll-wrap { height: auto; }
+body.scroll-mode #nav {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  padding: 6px 0 10px;
+  background: var(--bg-page);
+  transition: background 0.4s;
+}
 </style>
 </head>
 <body>
@@ -1326,7 +1341,7 @@ function scheduleAutoSave() {
   clearTimeout(autoSaveTimer);
   autoSaveTimer = setTimeout(() => {
     if (!bookId) return;
-    const scrollTop = viewMode === 'scroll' ? window.scrollY : 0;
+    const scrollTop = viewMode === 'scroll' ? bookEl.scrollTop : 0;
     saveProgress(bookId, { chapter: current, innerPage, scrollTop });
   }, 800);
 }
@@ -1406,7 +1421,7 @@ function restorePending() {
   pendingRestore = null;
 
   if (viewMode === 'scroll') {
-    window.scrollTo({ top: scrollTop || 0 });
+    bookEl.scrollTo({ top: scrollTop || 0 });
   } else {
     const safeIp = Math.min(ip || 0, totalInner - 1);
     if (safeIp > 0) goToInnerPage(safeIp, false);
@@ -1455,6 +1470,7 @@ function getColumnGap() {
 }
 
 function applyViewMode(skipRecalc = false) {
+  document.body.classList.toggle('scroll-mode', viewMode === 'scroll');
   bookEl.classList.remove('mode-scroll','mode-single','mode-double');
   bookEl.classList.add('mode-' + viewMode);
   readingArea.classList.toggle('wide', viewMode === 'double');
@@ -1463,7 +1479,7 @@ function applyViewMode(skipRecalc = false) {
     const ph = computePageHeight();
     document.documentElement.style.setProperty('--page-height', ph + 'px');
   } else {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    bookEl.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   innerPage = 0;
@@ -1555,11 +1571,11 @@ function renderChapter(idx, restorePos) {
     el.classList.toggle('current', i === current));
 
   if (viewMode === 'scroll') {
-    window.scrollTo({ top: 0, behavior: restorePos ? 'instant' : 'smooth' });
+    bookEl.scrollTo({ top: 0, behavior: restorePos ? 'instant' : 'smooth' });
     totalInner = 1;
     updateNav();
     if (restorePos && restorePos.scrollTop) {
-      requestAnimationFrame(() => window.scrollTo({ top: restorePos.scrollTop }));
+      requestAnimationFrame(() => { bookEl.scrollTop = restorePos.scrollTop; });
     }
     if (searchState._pendingJump !== null) {
       const pj = searchState._pendingJump;
@@ -1610,7 +1626,7 @@ btnPrev.onclick = () => {
   else if (current > 0) renderChapter(current - 1);
 };
 
-window.addEventListener('scroll', scheduleAutoSave, { passive: true });
+bookEl.addEventListener('scroll', scheduleAutoSave, { passive: true });
 
 // ── TOC ────────────────────────────────────────────────
 function closeToc() { tocOverlay.classList.remove('open'); }
@@ -1786,6 +1802,7 @@ let toolbarTimer;
 function resetToolbarTimer() {
   toolbar.classList.remove('hidden');
   clearTimeout(toolbarTimer);
+  if (viewMode === 'scroll') return;
   toolbarTimer = setTimeout(() => {
     if (!document.getElementById('search-bar').classList.contains('open'))
       toolbar.classList.add('hidden');
@@ -1798,6 +1815,7 @@ document.addEventListener('touchstart', resetToolbarTimer);
 document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key === 'f') { e.preventDefault(); openSearch(); return; }
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (viewMode === 'scroll') return;
   if ((e.key === 'ArrowLeft' || e.key === 'ArrowDown') && !btnNext.disabled) btnNext.click();
   if ((e.key === 'ArrowRight' || e.key === 'ArrowUp') && !btnPrev.disabled) btnPrev.click();
 });
@@ -1813,7 +1831,7 @@ window.addEventListener('resize', () => {
 // ── Close book ─────────────────────────────────────────
 document.getElementById('close-btn').onclick = () => {
   if (bookId) {
-    const scrollTop = viewMode === 'scroll' ? window.scrollY : 0;
+    const scrollTop = viewMode === 'scroll' ? bookEl.scrollTop : 0;
     if (!searchState.query) saveProgress(bookId, { chapter: current, innerPage, scrollTop });
   }
   closeSearch();
@@ -1827,7 +1845,7 @@ document.getElementById('close-btn').onclick = () => {
 // ── App Close / Unload ─────────────────────────────────
 window.addEventListener('beforeunload', () => {
   if (bookId && !searchState.query) {
-    const scrollTop = viewMode === 'scroll' ? window.scrollY : 0;
+    const scrollTop = viewMode === 'scroll' ? bookEl.scrollTop : 0;
     saveProgress(bookId, { chapter: current, innerPage, scrollTop });
   }
 });
@@ -1969,14 +1987,14 @@ function runSearch(query) {
   searchState.query = query;
   if (!query) {
     const savedPage   = innerPage;
-    const savedScroll = window.scrollY;
+    const savedScroll = bookEl.scrollTop;
     content.innerHTML = chapters[current].html || '';
     chapters.forEach(ch => { ch.markedHtml = null; });
     searchState.hits    = [];
     searchState.current = -1;
     searchState.chapterCounts = [];
     if (viewMode === 'scroll') {
-      window.scrollTo({ top: savedScroll, behavior: 'instant' });
+      bookEl.scrollTop = savedScroll;
     } else {
       totalInner = Math.max(1, Math.ceil(content.scrollWidth / (viewport.clientWidth + getColumnGap())));
       innerPage  = Math.min(savedPage, totalInner - 1);
@@ -2003,7 +2021,7 @@ function runSearch(query) {
     renderChapter(firstCh);
   } else {
     const savedPage   = innerPage;
-    const savedScroll = window.scrollY;
+    const savedScroll = bookEl.scrollTop;
     content.innerHTML = chapters[current].markedHtml || chapters[current].html;
     searchState.hits = [...content.querySelectorAll('mark.search-hit')];
     if (viewMode !== 'scroll') {
@@ -2013,7 +2031,7 @@ function runSearch(query) {
       updateNav();
       setTimeout(() => jumpToHit(0), 60);
     } else {
-      window.scrollTo({ top: savedScroll, behavior: 'instant' });
+      bookEl.scrollTop = savedScroll;
       requestAnimationFrame(() => jumpToHit(0));
     }
   }
@@ -2076,12 +2094,12 @@ function closeSearch() {
   document.getElementById('search-bar').classList.remove('open');
   document.getElementById('search-btn').classList.remove('active');
   const savedPage   = innerPage;
-  const savedScroll = window.scrollY;
+  const savedScroll = bookEl.scrollTop;
   if (searchState.query) {
     content.innerHTML = chapters[current]?.html || '';
     chapters.forEach(ch => { ch.markedHtml = null; });
     if (viewMode === 'scroll') {
-      window.scrollTo({ top: savedScroll, behavior: 'instant' });
+      bookEl.scrollTop = savedScroll;
     } else {
       totalInner = Math.max(1, Math.ceil(content.scrollWidth / (viewport.clientWidth + getColumnGap())));
       innerPage  = Math.min(savedPage, totalInner - 1);
